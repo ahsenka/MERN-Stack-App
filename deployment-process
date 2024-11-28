@@ -1,0 +1,48 @@
+Dağıtım Süreci, Mimari ve Karşılaşılan Zorluklar
+Dağıtım Süreci
+Projenin dağıtım süreci, aşağıdaki adımlarla gerçekleştirilmiştir:
+Docker İmajlarının Oluşturulması:
+Backend ve Frontend Dockerfile'ları kullanılarak her iki uygulama için Docker imajları oluşturulmuştur.
+docker build komutlarıyla her iki uygulama için imajlar yerel ortamda oluşturulup Docker Hub'a yüklenmiştir.
+Kubernetes Yapılandırması:
+Kubernetes kullanarak projede üç ana bileşen (backend, frontend ve MongoDB) için deployment ve service tanımlamaları yapılmıştır.
+Kubernetes pod'ları, her bir bileşen için oluşturulup uygun portlar ve ağ bağlantıları tanımlanmıştır.
+CI/CD Pipeline:
+GitHub Actions ile her yeni push işleminde Docker imajlarının build edilmesi ve Docker Hub'a yüklenmesi sağlanmıştır.
+Her commit sonrasında Kubernetes üzerinde dağıtım yapılacak şekilde yapılandırılan CI/CD pipeline'ı devreye girmektedir.
+Altyapı Kurulumu (isteğe bağlı):
+Terraform betikleri ile bulut altyapısı oluşturulmuş ve Kubernetes ortamı otomatik olarak kurulmuştur. Bu adım, bulut kaynaklarını yönetmek için kullanılabilir ancak projede bu aşama opsiyonel olarak bırakılmıştır.
+Mimari
+Projenin mimarisi aşağıdaki bileşenlerden oluşmaktadır:
+Frontend:
+React kullanılarak oluşturulmuş bir arayüzdür.
+Kubernetes üzerinde bir pod olarak çalıştırılmakta ve NodePort ile dış dünyaya açılmaktadır.
+Backend:
+Express.js ile yazılmış bir API'dir.
+Backend, MongoDB ile bağlantı kurmak için Kubernetes içindeki MongoDB servisini kullanmaktadır.
+Docker imajı olarak hazırlanmış ve Kubernetes'e dağıtılmıştır.
+MongoDB:
+MongoDB, Kubernetes üzerinde bir pod olarak çalışmaktadır ve ClusterIP servisi aracılığıyla sadece backend'e erişilebilir.
+Veritabanı bağlantıları, environment variable ile backend'e aktarılmaktadır.
+Kubernetes:
+Kubernetes, her bir bileşeni bir pod olarak çalıştırır ve bu bileşenlerin birbirleriyle iletişim kurmasını sağlayan servisler oluşturulmuştur.
+Karşılaşılan Zorluklar
+Proje sırasında karşılaşılan bazı zorluklar ve bunlara yönelik çözümler:
+Docker İmajlarının Çekilememesi (ImagePullBackOff):
+Kubernetes pod'ları, Docker imajlarını çekmeye çalışırken ImagePullBackOff hatası aldık.
+Bu hata, genellikle Docker Hub'da imajın bulunmaması veya imajın doğru bir şekilde push edilmemesinden kaynaklanır. İmajların doğru şekilde push edildiği ve doğru etiketin kullanıldığını doğruladık.
+Kubernetes Pod’larının ContainerCreating Durumunda Kalması:
+MongoDB ve frontend pod'larının ContainerCreating durumu, genellikle Kubernetes cluster'ında kaynak sıkıntısı veya ağ problemleri nedeniyle oluşur.
+Kubernetes pod'larının doğru şekilde dağıtıldığından ve ağ bağlantılarının uygun şekilde yapılandırıldığından emin olduk.
+Dockerfile Yapılandırma Sorunları:
+Dockerfile'larda bazı hatalar nedeniyle build işlemleri başarısız oldu. Bu hatalar genellikle bağımlılıkların yanlış tanımlanması veya dosya izinlerinden kaynaklanıyordu. Dockerfile'ları gözden geçirip doğru yapılandırmalar yaparak bu hataları giderdik.
+Kubernetes Yapılandırma Hataları (Invalid YAML):
+Kubernetes deployment ve service yapılandırmalarında yapılan küçük hatalar nedeniyle kubectl apply komutuyla dağıtım yaparken hata aldık.
+Yapılandırma dosyalarını dikkatlice gözden geçirdik ve geçerli YAML biçiminde düzenlemeler yaptık.
+CI/CD Hataları ve GitHub Actions:
+GitHub Actions pipeline'ının doğru çalışabilmesi için Docker imajlarının doğru yapılandırılmasını sağlamak zor oldu. Çeşitli docker build ve docker push adımlarını doğru bir şekilde yapılandırarak CI/CD sürecini düzgün hale getirdik.
+GitHub Bağlantı Sorunları:
+GitHub'a erişim sağlanırken SSH anahtarı ile bağlantı hataları yaşandı. GitHub'un SSH bağlantısını doğru bir şekilde yapılandırarak bu sorunu çözdük.
+Sonuç
+Projede kullanılan Docker, Kubernetes, GitHub Actions ve Terraform gibi teknolojiler, bir MERN yığını uygulamasını konteynerleştirip dağıtmak için oldukça etkili araçlar sağladı. Ancak dağıtım süreci boyunca çeşitli yapılandırma ve bağlantı hataları ile karşılaşıldı. Bu zorluklar, doğru dokümantasyon ve dikkatli yapılandırma ile aşılabildi.
+Dağıtım süreci tamamlandığında, uygulama başarıyla Kubernetes ortamına dağıtıldı ve Docker Hub üzerinden güncel imajlar alındı. CI/CD pipeline'ı sorunsuz çalışmaya başladı.
